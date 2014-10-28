@@ -5,11 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-public class templateDao {
+public class TemplateDao {
 
 	private DBConnector dbc;
 
-	public templateDao() {
+	public TemplateDao() {
 		dbc = new DBConnector();
 	}
 

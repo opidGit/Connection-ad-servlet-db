@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import template.dao.templateDao;
+import template.dao.TemplateDao;
 
 /**
  * Servlet implementation class GetData
@@ -37,8 +37,8 @@ public class GetData extends HttpServlet {
 		out.println("'" + data + "' success");
 
 		/* DB query */
-		templateDao db = new templateDao();
- 		int getData = db.getData(0);
+		TemplateDao db = new TemplateDao();
+ 		//int getData = db.getData(0);
 		
 		System.out.println(data);
 	}
