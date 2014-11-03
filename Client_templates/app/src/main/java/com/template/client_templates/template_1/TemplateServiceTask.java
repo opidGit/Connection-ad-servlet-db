@@ -1,4 +1,4 @@
-package com.template.client_templates.template_1;
+﻿package com.template.client_templates.template_1;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 class TemplateServiceTask extends AsyncTask<ArrayList<String>, Object, ArrayList<String>> {
     final String APP_TAG = "TemplateServiceTask";
     private String scheme = "http";
-    private String host = "203.247.240.62";
+    private String host = "127.0.0.1";
     private int port = 80;
     private String path = "server_template/GetData";
 
