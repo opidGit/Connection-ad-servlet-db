@@ -1,4 +1,4 @@
-package com.template.client_templates.template_2;
+package com.template.client_templates.template_json;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,27 +18,27 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
-public class MyActivity_combine extends Activity {
+public class MyActivity_json extends Activity {
 
     EditText edSendingData;
     TextView tvReceiveData;
@@ -124,100 +124,7 @@ public class MyActivity_combine extends Activity {
         @Override
         protected String doInBackground(ArrayList<String>... params) {
             return requestPOST(params[0]);
-            //return requestGET(params[0]);
         }
-
-        /**
-         * ***************
-         * GET 방식 사용 *
-         * ***************
-         */
-        private String requestGET(ArrayList<String> parameters) {
-            URI uri = null;
-            HttpGet httpGet = null;
-            HttpResponse response = null;
-            HttpClient client = new DefaultHttpClient();
-
-            ArrayList<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(); // http parameter
-            String result = null; // return value
-
-
-            try {
-                /**
-                 * **************
-                 * 파라미터 추가 *
-                 * **************
-                 */
-                nameValuePairs.add(new BasicNameValuePair("data", parameters.get(0)));
-                String qParams = URLEncodedUtils.format(nameValuePairs, "UTF-8");
-
-                /**
-                 * **************
-                 * 타임아웃 설정 *
-                 * **************
-                 */
-                HttpParams params = client.getParams();
-                HttpConnectionParams.setConnectionTimeout(params, 5000); // 서버가 응답하는 시간 한도
-                HttpConnectionParams.setSoTimeout(params, 5000); // 서버가 응답하지 않는 경우
-
-                /**
-                 * *************
-                 * 서버와 연결 *
-                 * *************
-                 */
-                uri = URIUtils.createURI(scheme, host, port, path, qParams, null);
-                httpGet = new HttpGet(uri);
-
-                ////////////////////////////////////////////////////////////////////
-                // sending and receive
-                /**
-                 * *************
-                 * 데이터 발신 *
-                 * *************
-                 */
-                response = client.execute(httpGet); // 발신
-
-                /**
-                 * *************
-                 * 데이터 수신 *
-                 * *************
-                 */
-                HttpEntity httpEntity = response.getEntity(); // 수신
-                result = EntityUtils.toString(httpEntity);
-
-                /**
-                 * *************
-                 * HTTP 응답 상태*
-                 * *************
-                 */
-                ////////////////////////////////////////////////////////////////////
-                // Check result status of the request.
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    Log.d(APP_TAG, "HTTP GET succeeded");
-
-                    StringBuilder strBuilder = new StringBuilder();
-                    HttpEntity messageEntity = response.getEntity();
-                    InputStream is = messageEntity.getContent();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        strBuilder.append(line);
-                    }
-                    Log.d(APP_TAG, strBuilder.toString());
-                }
-
-            } catch (URISyntaxException e) {
-                Log.e("URISyntaxException", e.getMessage());
-            } catch (IOException e) {
-                Log.e("IOException", e.getMessage());
-            } catch (Exception e) {
-                Log.e("Exception", e.getMessage());
-            }
-
-            return result;
-
-        }
-
 
         /**
          * ****************
@@ -239,6 +146,10 @@ public class MyActivity_combine extends Activity {
                 // 2. make POST request to the given URL
                 HttpPost httpPost = new HttpPost(uri);
 
+                String json = "";
+                JSONObject jsonObject = new JSONObject();
+
+
                 /**
                  * **************
                  * 파라미터 추가 *
@@ -246,29 +157,19 @@ public class MyActivity_combine extends Activity {
                  */
                 ///////////////////////////////////////////////////////////////////////////////////////
                 // 사용자 파라미터 추가하는 부분
-                ArrayList<NameValuePair> paramList = new ArrayList<NameValuePair>();
-                paramList.add(new BasicNameValuePair("data", parameters.get(0)));
+                jsonObject.put("key", 1);
+                //jsonObject.accumulate("key", parameters.get(0));
 
-                /**
-                 * *************
-                 * 데이터 발신 *
-                 * *************
-                 */
-                try {
-                    UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList, "UTF-8");
-                    httpPost.setEntity(entity);
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                json = jsonObject.toString();
+
+                StringEntity se = new StringEntity(json);
+
+                httpPost.setEntity(se);
+                httpPost.setHeader("Accept", "application/json");
+                httpPost.setHeader("Content-type", "application/json");
+
                 HttpResponse httpResponse = httpClient.execute(httpPost);
-
-                /**
-                 * *************
-                 * 데이터 수신 *
-                 * *************
-                 */
                 inputStream = httpResponse.getEntity().getContent();
-
 
                 if (inputStream != null)
                     result = convertInputStreamToString(inputStream);
@@ -277,7 +178,7 @@ public class MyActivity_combine extends Activity {
 
 
             } catch (Exception e) {
-                Log.e("HttpPost", e.getLocalizedMessage());
+                Log.d("HttpPost", e.getLocalizedMessage());
             }
 
             return result;

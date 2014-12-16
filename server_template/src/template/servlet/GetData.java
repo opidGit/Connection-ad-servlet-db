@@ -12,7 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import template.dao.TemplateDao;
 
 /**
- * Servlet implementation class GetData
+ * 
+ * @author yeongjun
+ * @since 2014.12.16
+ *
  */
 @WebServlet(name = "GetData", urlPatterns = { "/GetData" })
 public class GetData extends HttpServlet {
@@ -27,20 +30,33 @@ public class GetData extends HttpServlet {
 
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		response.setContentType("text/html;charset=UTF-8");
+		// 인코딩 처리
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=utf-8");
+		
 		PrintWriter out = response.getWriter();
-		
-		/* Get data from Android. */
+
+		// HTTP 방식 확인 메시지
+		System.out.println((request.getMethod() == "GET" ? "GET" : "POST")
+				+ "방식");
+
+		/******************************************
+		 * 클라이언트로부터 받은 파라미터 값 받기 *
+		 ******************************************/
 		String data = request.getParameter("data");
-		
-		/* Send a data to Android. */ 
+		System.out.println("Data : " + data);
+
+		/*****************************************
+		 * 서버에서 클라이언트로 데이터 전송하기 *
+		 *****************************************/
 		out.println("'" + data + "' success");
 
-		/* DB query */
+		/*************************
+		 * 데이터베이스 접근하기 *
+		 *************************/
 		TemplateDao db = new TemplateDao();
- 		//int getData = db.getData(0);
-		
-		System.out.println(data);
+		// int getData = db.getData(0);) {
+
 	}
 
 	protected void doGet(HttpServletRequest request,

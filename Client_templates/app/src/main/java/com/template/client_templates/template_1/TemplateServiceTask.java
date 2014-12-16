@@ -1,4 +1,4 @@
-﻿package com.template.client_templates.template_1;
+package com.template.client_templates.template_1;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -9,13 +9,16 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +34,7 @@ import java.util.ArrayList;
 class TemplateServiceTask extends AsyncTask<ArrayList<String>, Object, ArrayList<String>> {
     final String APP_TAG = "TemplateServiceTask";
     private String scheme = "http";
-    private String host = "127.0.0.1";
+    private String host = "203.247.240.62";
     private int port = 80;
     private String path = "server_template/GetData";
 
@@ -49,7 +52,12 @@ class TemplateServiceTask extends AsyncTask<ArrayList<String>, Object, ArrayList
         return requestGetHttp(params[0]);
     }
 
-    // Request Get method
+
+    /**
+     * **********************************
+     * GET 방식 사용 *
+     * ***********************************
+     */
     private ArrayList<String> requestGetHttp(ArrayList<String> parameters) {
         URI uri = null;
         HttpGet httpGet = null;
@@ -116,11 +124,72 @@ class TemplateServiceTask extends AsyncTask<ArrayList<String>, Object, ArrayList
 
     }
 
-    // TODO: post 방식은 아직 실험 안해봄
-    private HttpResponse requestPostHttp() {
-        HttpResponse response = null;
-        return response;
+
+    /**
+     * **********************************
+     * POST 방식 사용 *
+     * ***********************************
+     */
+    private String requestHttpPOST(ArrayList<String> parameters) {
+        final String TAG = "REQUEST_POST_HTTP";
+
+        InputStream inputStream = null;
+        URI uri = null;
+        String result = "";
+        HttpClient httpClient = new DefaultHttpClient();
+
+        try {
+            uri = URIUtils.createURI(scheme, host, port, path, null, null);
+
+            // 2. make POST request to the given URL
+            HttpPost httpPost = new HttpPost(uri);
+
+            String json = "";
+            JSONObject jsonObject = new JSONObject();
+
+
+            ///////////////////////////////////////////////////////////////////////////////////////
+            // 사용자 파라미터 추가하는 부분
+            jsonObject.put("key", 1);
+            //jsonObject.accumulate("key", parameters.get(0));
+
+            json = jsonObject.toString();
+
+            StringEntity se = new StringEntity(json);
+
+            httpPost.setEntity(se);
+            httpPost.setHeader("Accept", "application/json");
+            httpPost.setHeader("Content-type", "application/json");
+
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            inputStream = httpResponse.getEntity().getContent();
+
+            if (inputStream != null)
+                result = convertInputStreamToString(inputStream);
+            else
+                result = "Did not work!";
+
+
+        } catch (Exception e) {
+            Log.d("HttpPost", e.getLocalizedMessage());
+        }
+
+        return result;
+
     }
+
+    private static String convertInputStreamToString(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String line = "";
+        String result = "";
+        while ((line = bufferedReader.readLine()) != null)
+            result += line;
+
+        inputStream.close();
+        return result;
+    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
 
     /* 3. Return to Activity. */
     @Override
