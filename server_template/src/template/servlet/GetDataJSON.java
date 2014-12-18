@@ -43,30 +43,30 @@ public class GetDataJSON extends HttpServlet {
 		String originalStr = "";
 		if (br != null)
 			originalStr = br.readLine();
-		System.out.println("test");
-		System.out.println("jsonstr : " + originalStr);
+		System.out.println("get json : " + originalStr);
 		// -----------------------------------------------------------------
 
 		/*****************************
 		 * 클라이언트 >> 서버 : JSON *
 		 *****************************/
 		JSONObject jObj = (JSONObject) JSONValue.parse(originalStr);
-		String args = (String) jObj.get("key");
+		String args = (String) jObj.get("data");
 		// -----------------------------------------------------------------
 
 		/*****************************
 		 * 서버 >> 클라이언트 : JSON *
 		 *****************************/
 		JSONArray jsonArr = new JSONArray();
-		JSONObject tmpObj = null;
+		JSONObject returnJsonObj = null;
 
-		JSONObject resultJSON = new JSONObject();
-
-		tmpObj = new JSONObject();
-		tmpObj.put("arg1", "data");
-		tmpObj.put("arg2", "data");
-		jsonArr.add(tmpObj);
-
+		returnJsonObj = new JSONObject();
+		returnJsonObj.put("data", args);
+		jsonArr.add(returnJsonObj);
+		returnJsonObj = new JSONObject();
+		returnJsonObj.put("test", args);
+		returnJsonObj.put("test2", args);
+		jsonArr.add(returnJsonObj);
+		
 		out.println(jsonArr.toJSONString());
 		// -----------------------------------------------------------------
 

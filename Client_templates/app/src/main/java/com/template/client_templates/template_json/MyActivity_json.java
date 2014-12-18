@@ -14,28 +14,22 @@ import android.widget.TextView;
 
 import com.template.client_templates.R;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 public class MyActivity_json extends Activity {
@@ -67,15 +61,15 @@ public class MyActivity_json extends Activity {
     };
 
     private void findViewsById() {
-        edSendingData = (EditText) findViewById(R.id.ed_sending_2);
-        tvReceiveData = (TextView) findViewById(R.id.tv_received_2);
-        btnSubmit = (Button) findViewById(R.id.bt_submit_2);
+        edSendingData = (EditText) findViewById(R.id.ed_sending_json);
+        tvReceiveData = (TextView) findViewById(R.id.tv_received_json);
+        btnSubmit = (Button) findViewById(R.id.bt_submit_json);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_activity_combine);
+        setContentView(R.layout.activity_my_activity_json);
         findViewsById();
 
         btnSubmit.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +78,6 @@ public class MyActivity_json extends Activity {
                 ArrayList<String> param = new ArrayList<String>();
 
                 param.add(edSendingData.getText().toString());
-                //param.add("Test3");
 
                 /* 1. execute */
                 HTTPServiceTask task = new HTTPServiceTask(getApplicationContext(), listener);
@@ -111,7 +104,7 @@ public class MyActivity_json extends Activity {
         private String scheme = "http";
         private String host = "203.247.240.62";
         private int port = 80;
-        private String path = "server_template/GetData";
+        private String path = "server_template/GetDataJSON";
 
         private Context mContext = null;
         private TemplateServiceListener mlistener = null;
@@ -132,43 +125,56 @@ public class MyActivity_json extends Activity {
          * ****************
          */
         private String requestPOST(ArrayList<String> parameters) {
-            final String TAG = "REQUEST_POST_HTTP";
+            final String TAG = "REQUEST_POST_HTTP_JSON";
 
             InputStream inputStream = null;
             URI uri = null;
             String result = "";
             HttpClient httpClient = new DefaultHttpClient();
-            //ArrayList<String> result = new ArrayList<>();
 
             try {
+
+                /**
+                 * *************
+                 * 연결 *
+                 * *************
+                 */
                 uri = URIUtils.createURI(scheme, host, port, path, null, null);
-
-                // 2. make POST request to the given URL
                 HttpPost httpPost = new HttpPost(uri);
-
-                String json = "";
-                JSONObject jsonObject = new JSONObject();
-
 
                 /**
                  * **************
                  * 파라미터 추가 *
                  * **************
                  */
-                ///////////////////////////////////////////////////////////////////////////////////////
-                // 사용자 파라미터 추가하는 부분
-                jsonObject.put("key", 1);
-                //jsonObject.accumulate("key", parameters.get(0));
+                JSONObject jobj = new JSONObject();
+                jobj.put("data", parameters.get(0));
+                StringEntity se = new StringEntity(jobj.toString());
 
-                json = jsonObject.toString();
+                /**
+                 * *************
+                 * 각종 시간 설정 *
+                 * *************
+                 */
+                HttpParams params = httpClient.getParams();
+                HttpConnectionParams.setConnectionTimeout(params, 5000); // 서버가 응답하는 시간 한도
+                HttpConnectionParams.setSoTimeout(params, 5000); // 서버가 응답하지 않는 경우
 
-                StringEntity se = new StringEntity(json);
-
+                /**
+                 * *************
+                 * 데이터 발신 *
+                 * *************
+                 */
                 httpPost.setEntity(se);
                 httpPost.setHeader("Accept", "application/json");
                 httpPost.setHeader("Content-type", "application/json");
-
                 HttpResponse httpResponse = httpClient.execute(httpPost);
+
+                /**
+                 * *************
+                 * 데이터 수신 *
+                 * *************
+                 */
                 inputStream = httpResponse.getEntity().getContent();
 
                 if (inputStream != null)
@@ -176,9 +182,10 @@ public class MyActivity_json extends Activity {
                 else
                     result = "Did not work!";
 
-
+            } catch (UnsupportedEncodingException e) {
+                Log.e(TAG, e.getMessage());
             } catch (Exception e) {
-                Log.d("HttpPost", e.getLocalizedMessage());
+                Log.e(TAG, e.getLocalizedMessage());
             }
 
             return result;

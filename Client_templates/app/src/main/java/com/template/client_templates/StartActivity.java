@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 
 import com.template.client_templates.template_1.MyActivity;
 import com.template.client_templates.template_2.MyActivity_combine;
+import com.template.client_templates.template_json.MyActivity_json;
 
 public class StartActivity extends Activity {
     LinearLayout ml;
@@ -23,6 +24,7 @@ public class StartActivity extends Activity {
 
         createButton("template 1", MyActivity.class);
         createButton("template 2", MyActivity_combine.class);
+        createButton("template 3", MyActivity_json.class);
 
     }
 
