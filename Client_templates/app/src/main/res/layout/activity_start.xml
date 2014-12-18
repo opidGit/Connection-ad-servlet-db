@@ -11,8 +11,11 @@
     android:id="@+id/mainlayout">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="bis app" />
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="client-server template" />
+
 
 </LinearLayout>
